@@ -1,9 +1,9 @@
 # Archive review inventory
 
 Status: initial inventory; review in progress  
-Last checked: 2026-11-04  
+Last checked: 2026-11-04 (follow-up comparison)  
 Repository: `pikachu364/glosa`  
-Base snapshot: `main` at `24681a45430bb93bf47098f42b0adb1387c84dcd`
+Base snapshot: `main` at `4c7e123953bb04ff6ff354da4af78dc0e93a9f80`
 
 ## Purpose
 
@@ -152,7 +152,35 @@ A branch that is already fully represented in main can be considered for deletio
 ## Remaining work
 
 - Re-fetch branch heads and compare unique commits before any cleanup.
-- Inspect the unique historical log material in `docs/trace-tempo-branch-state-2026-10-26`.
-- Inspect the remaining unique material in `reverse/v1-tempo-investigation` and `fix/ballade-v1-layout-2026-10-22` only where main does not already contain a later record.
+- Complete a final content-level review of archived v1 branches only if new evidence appears; current comparison found no confirmed current findings requiring re-import.
 - Finish classifying v1-v4 fixture/data assets and their provenance.
 - Keep the main-to-upstream reset/synchronization out of scope until documentation and preservation review is complete.
+
+
+## Follow-up comparison — 2026-11-04
+
+Compared the archived investigation branches against main at `4c7e123953bb04ff6ff354da4af78dc0e93a9f80`.
+
+### `reverse/v1-tempo-investigation`
+
+- The branch remains 33 commits ahead and 618 behind main; retain it as historical Git history.
+- Its old FACTS headings F-051, F-057, F-058, F-060, F-061, and F-064 do not need wholesale re-import. Their subject matter is represented by later/current main records, including F-047, F-051, F-055, F-057, F-065, F-085, F-106, F-108, F-111, F-112, and F-116.
+- The branch's older LOG and NEXT_STEPS entries describe investigation stages that have since been superseded or completed in main. No confirmed current finding requiring a separate content import was identified in this pass.
+- `docs/MACOS_RUNNER_POLICY.md` is present in main; do not re-import it.
+
+### `fix/ballade-v1-layout-2026-10-22`
+
+- The branch remains 3 commits ahead and 289 behind main.
+- Its only file-level difference is in `docs/reverse/LOG.md`; its unique dated entry is covered by later main investigation records. Retain the branch as historical v1 history; no re-import is currently justified.
+
+### `docs/trace-tempo-branch-state-2026-10-26`
+
+- The branch remains 4 commits ahead and 220 behind main.
+- Its one branch-only LOG heading records the correction to the private SNG2S analysis-export source path and the unresolved status-byte/drain investigation.
+- The resulting findings and limitations are represented by main F-125 and related current records. Do not copy the old LOG section wholesale; retain the branch as historical provenance.
+
+### Decision
+
+All three branches remain `ARCHIVE`. This comparison found no confirmed missing current documentation that needs to be copied into main. Preserve the branches and their commit histories; do not delete them.
+
+The ordinary merged-task branch cleanup remains separate. Recheck branch heads and preserve exceptions before any deletion. This inventory update does not delete any branch or file.
