@@ -184,3 +184,39 @@ Compared the archived investigation branches against main at `4c7e123953bb04ff6f
 All three branches remain `ARCHIVE`. This comparison found no confirmed missing current documentation that needs to be copied into main. Preserve the branches and their commit histories; do not delete them.
 
 The ordinary merged-task branch cleanup remains separate. Recheck branch heads and preserve exceptions before any deletion. This inventory update does not delete any branch or file.
+
+
+## Follow-up: `docs/ballade-version-testdata` — 2026-11-04
+
+Compared branch `docs/ballade-version-testdata` with main at `323afee0205cc3f0b37172113d0e27cd60057f16`.
+
+- The branch has 68 commits ahead of main and 919 behind; it is a historical development/data branch, not a clean documentation-only branch.
+- The comparison includes workflow changes, a historical SNG converter source file, converter tests, fixture documentation, manifests, reference MIDI, saved pre-fix Glosa MIDI, SNG2S documentation/archive, and dated work records. Do not merge the branch wholesale.
+
+### Classification
+
+| Material | Current classification | Reason / handling |
+|---|---|---|
+| Four public SNG input fixtures (v1-v4) | KEEP in main | Current main already has the four SNG input fixtures and SHA-256 values recorded in its current README/manifest. No duplicate copy needed. |
+| Branch `testdata/ballade/README.md` | MERGED / superseded | Older README has sections for saved MIDI outputs, validation status, future work, and pending playback. Some facts are historical, but its status text is stale relative to current main (including v1 support and current CI assertions). Do not replace current main README with it. |
+| Branch `testdata/ballade/manifest.json` | ARCHIVE only | Contains historical reference-output sizes and earlier verification claims, but also states v1 layout is unsupported and v1 is excluded. That is superseded by current main. Do not copy this manifest over main. |
+| `v1/sng2gs/runner.MID` and v2-v4 `sng2gs/*.MID` | ARCHIVE / provenance-sensitive | Reference MIDI files are useful for future comparison. Keep them on the historical branch. Do not copy into main without confirming provenance, rights, and whether public distribution is intended. |
+| v2-v4 `glosa-test-convert/*.mid` | ARCHIVE / historical outputs | These are explicitly described as pre-fix saved Glosa outputs. Preserve as historical comparison artifacts, not current expected outputs. |
+| `testdata/ballade/sng2gs/SNG2S.DOC`, `README.DOC`, `sng2s33.lzh` | ARCHIVE / provenance-sensitive | Historical SNG2S documentation and archive may be valuable for v1 research. Version/options and redistribution rights are not established here. Preserve branch; do not import into main pending provenance review. |
+| `testdata/ballade/作業記録/2026-10-19.md` | ARCHIVE | Historical work log with dated observations. Keep on the branch; do not treat its old conclusions as current facts. |
+| `src/Glosa.Core/Smf/SngConverter.cs` | MERGED / superseded implementation history | The branch contains an older converter under the old namespace/path. Current main has the evolved implementation at `src/Glosa.Core/Sng/SngConverter.cs`, including the legacy v1 path. Do not copy the old file back. |
+| `tests/Glosa.Tests/SngConverterTests.cs` | MERGED / superseded tests | Main has a later test suite using the current `Glosa.Core.Sng` namespace and newer v1-v4 assertions. Preserve branch history, but do not overwrite current tests with the older version. |
+| Workflow changes | MERGED / verify separately if needed | The branch's CI concurrency addition is not a reason to restore its older workflow file over main. Current workflow policy differs. |
+| 68 unique commits | ARCHIVE | Keep the branch and its Git history; it records the evolution of converter, tests, and comparison data. |
+
+### Confirmed current-main state
+
+- Main `testdata/ballade/README.md` describes the four public SNG fixtures, their SHA-256 values, current public CI scope, and explicitly distinguishes private/reference comparison data from public CI.
+- Main `testdata/ballade/manifest.json` documents the current validation scope and limitations; it no longer says v1 is unsupported.
+- Main converter is at `src/Glosa.Core/Sng/SngConverter.cs`, not the old branch path `src/Glosa.Core/Smf/SngConverter.cs`.
+- Main test suite is `tests/Glosa.Tests/SngConverterTests.cs` and includes current v1 and v2-v4 fixture coverage.
+- The branch's README/manifest contain historical comparison details, but their old status statements must not be presented as current facts.
+
+### Decision
+
+Keep `docs/ballade-version-testdata` as `ARCHIVE`; do not merge it wholesale and do not delete it. Keep current main fixtures/docs/tests as the authoritative current state. Retain reference MIDI, pre-fix outputs, SNG2S documents/archive, and the dated work log on the historical branch until provenance and future-use decisions are made. No file or branch deletion is authorized by this review.
