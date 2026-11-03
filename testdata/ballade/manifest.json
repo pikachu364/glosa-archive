@@ -1,33 +1,57 @@
 {
-  "description": "Original Roland/Boss Ballade SNG test fixtures for version-specific converter compatibility testing.",
+  "description": "Public Roland/Boss Ballade SNG input fixtures used by Glosa's version-specific converter tests.",
+  "validationScope": {
+    "publicCi": {
+      "workflow": ".github/workflows/ci.yml",
+      "testProject": "tests/Glosa.Tests/Glosa.Tests.csproj",
+      "checks": [
+        "Each checked-in SNG fixture converts to an SMF that SmfReader can read.",
+        "The generated sequence contains at least two tracks.",
+        "The v1 runner.SNG conversion has the expected tempo events at ticks 0, 8, and 192.",
+        "The v1 runner.SNG conversion has 3295 Note-on and 3295 Note-off events; this is a count check, not event-by-event equality.",
+        "A v1 no-change tempo-stream test retains the default 120 BPM tempo."
+      ],
+      "doesNotEstablish": [
+        "Byte-for-byte equality with reference SMF files.",
+        "Complete event-by-event equality for every Ballade version.",
+        "Actual playback or listening equivalence."
+      ]
+    },
+    "privateReferenceValidation": {
+      "repository": "pikachu364/glosa-private-data",
+      "containsPrivateBinaryFixtures": true,
+      "publicRepositoryIncludesPrivateReferenceMidi": false,
+      "note": "Historical private-fixture CI results apply only to the Glosa commit tested by that run. Rerun the private workflow against a later commit before treating it as validated."
+    }
+  },
   "samples": [
     {
       "file": "v1/runner.SNG",
       "balladeVersion": "1.00",
       "sizeBytes": 85897,
       "sha256": "e61b8b0315a3752dfa3d3546d5a436df0d4b0421201183c21ce4bf1780556e15",
-      "verification": "File copied to repository testdata; SHA-256 recorded; converter validation pending."
+      "verification": "Public CI converts this fixture and reads the generated SMF with SmfReader. Separate tests check tempo-event byte sequences and Note-on/Note-off counts; there is no public event-by-event comparison against the reference MIDI."
     },
     {
       "file": "v2/SHIZUME0.SNG",
       "balladeVersion": "2.00",
       "sizeBytes": 75597,
       "sha256": "eb6e1eb5bd1aeb36acb7b53a89fb8409b09e7d3988a45847309da105622272ee",
-      "verification": "File copied to repository testdata; SHA-256 recorded; converter validation pending."
+      "verification": "Public CI converts this fixture and reads the generated SMF with SmfReader. This does not establish event-by-event equality with the private reference MIDI or playback equivalence."
     },
     {
       "file": "v3/START__0.SNG",
       "balladeVersion": "3.00",
       "sizeBytes": 82391,
       "sha256": "b4b719cec15139e411c94c34b05ca698e9432b9ccad308a808f08a648256cbe4",
-      "verification": "File copied to repository testdata; SHA-256 recorded; conversion generated START__0.mid (48923 bytes); MIDI read-back/playback validation pending."
+      "verification": "Public CI converts this fixture and reads the generated SMF with SmfReader. This does not establish event-by-event equality with the private reference MIDI or playback equivalence."
     },
     {
       "file": "v4/BOURREE0.SNG",
       "balladeVersion": "4.00",
       "sizeBytes": 49517,
       "sha256": "a1eb69b4735b809e35c9c368776e9dae621e30405dc5a9c717133654c5f7b715",
-      "verification": "File copied to repository testdata; SHA-256 recorded; converter validation pending."
+      "verification": "Public CI converts this fixture and reads the generated SMF with SmfReader. This does not establish event-by-event equality with the private reference MIDI or playback equivalence."
     }
   ]
 }
