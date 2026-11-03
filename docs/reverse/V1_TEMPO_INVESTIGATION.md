@@ -1,6 +1,6 @@
 # v1 Tempo Event Investigation
 
-> **Current status (updated 2026-10-25):** Static startup tracing and byte-level comparison with the saved reference MIDI now explain the inspected v1 path. The original EXE initialized image confirms `0x6EE = 4`; setup SysEx at ticks 0/4/8/8 has been mapped to producer paths, and both tick-8 payloads match byte-for-byte (FACTS F-094/F-095/F-097/F-101). The coarse 869,000 µs/qn event at tick 8 and exact 869,565 µs/qn event at tick 192 arise from distinct paths. Runtime trace/playback, indirect writes, and generalization to every v1 file remain unverified. Do not change converter timing on the basis of static analysis alone. See [NEXT_STEPS.md](NEXT_STEPS.md), T-017.
+> **Current status (reconciled 2026-11-03):** Static initialized-data inspection, startup call-order/dataflow tracing, and byte-level comparison with the saved `runner.MID` / `TEST.MID` references explain the inspected v1 path. The original EXE initialized image confirms `0x6EE = 4`; setup SysEx at ticks 0/4/8/8 has been mapped to producer paths, and both tick-8 payloads match byte-for-byte (FACTS F-094/F-095/F-097/F-101). The coarse 869,000 µs/qn event at tick 8 and exact 869,565 µs/qn event at tick 192 arise from distinct paths. Runtime trace/playback and generalization beyond the inspected v1 fixtures remain unverified; indirect/aliased runtime writes are not fully ruled out. Do not change converter timing on the basis of static analysis alone. See [NEXT_STEPS.md](NEXT_STEPS.md), T-017.
 
 ## Scope and current reference
 
