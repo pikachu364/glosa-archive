@@ -1,9 +1,9 @@
 # Archive review inventory
 
 Status: initial inventory; review in progress  
-Last checked: 2026-11-04 (follow-up comparison)  
+Last checked: 2026-11-05 (post-PR #61 branch audit)  
 Repository: `pikachu364/glosa`  
-Base snapshot: `main` at `4c7e123953bb04ff6ff354da4af78dc0e93a9f80`
+Base snapshot: `main` at `95b575dd799786f11d6df52d2483c3eab7d8451b`
 
 ## Purpose
 
@@ -123,7 +123,7 @@ This is a prior comparison snapshot. Recheck each branch head before deleting an
 
 ### `development` branch
 
-The last fetched branch list showed `development` at the same SHA as main (`24681a45430bb93bf47098f42b0adb1387c84dcd`). It was created accidentally during an earlier operation. Do not use it for development. Its deletion is a separate cleanup decision and is not performed by this inventory PR.
+`development` was created accidentally during an earlier operation and is not used for development. On 2026-11-05 it pointed to `24681a45430bb93bf47098f42b0adb1387c84dcd`, while `main` pointed to `95b575dd799786f11d6df52d2483c3eab7d8451b`. It was 6 commits behind `main`, 0 commits ahead, with no file differences in the comparison. Do not use it for development. Its deletion is a separate cleanup decision and is not performed by this inventory PR.
 
 ## Branch cleanup policy
 
@@ -220,3 +220,49 @@ Compared branch `docs/ballade-version-testdata` with main at `323afee0205cc3f0b3
 ### Decision
 
 Keep `docs/ballade-version-testdata` as `ARCHIVE`; do not merge it wholesale and do not delete it. Keep current main fixtures/docs/tests as the authoritative current state. Retain reference MIDI, pre-fix outputs, SNG2S documents/archive, and the dated work log on the historical branch until provenance and future-use decisions are made. No file or branch deletion is authorized by this review.
+
+
+## Follow-up branch audit — 2026-11-05
+
+Base: `main` at `95b575dd799786f11d6df52d2483c3eab7d8451b` (after PR #61).
+The branch list contained 60 branches and the open-PR list was empty at the time of review.
+
+### Confirmed archived branches
+
+| Branch | Ahead | Behind | Review result |
+|---|---:|---:|---|
+| `feature/midi-converter-validation` | 11 | 648 | ARCHIVE; retain v1 MIDI comparison tool and history; do not merge wholesale or delete |
+| `feature/ballade-sng` | 5 | 925 | ARCHIVE; retain v1 implementation history; no current-doc re-import |
+| `reverse/v1-tempo-investigation` | 33 | 622 | ARCHIVE; retain historical investigation; current main contains later findings |
+| `fix/ballade-v1-layout-2026-10-22` | 3 | 293 | ARCHIVE; unique old LOG entry is covered by later investigation records |
+| `docs/trace-tempo-branch-state-2026-10-26` | 4 | 224 | ARCHIVE; retain historical provenance; current facts/limitations are represented in main |
+
+### Detailed review notes
+
+- `feature/midi-converter-validation`: the branch-only files are the old local MIDI comparison CLI, four tests, README, dependency file, and validation note. Static review found that unmatched-note signatures omit channel and pitch, key-signature values are not compared, and some event-specific fields are absent from the comparison signature. The four tests do not cover these cases. The branch documentation says the tests and real-data validation were not yet run. Preserve this as historical v1 material; do not present its PASS result as complete MIDI equivalence.
+- `feature/ballade-sng`: the branch's SNG2S note contains local reference-file details and a local MIDI hash; main has an independently written, narrower technical summary. Its extra Windows audio-device investigation note is environment-specific and records unresolved hypotheses. Do not re-import those sections into current main documentation.
+- `reverse/v1-tempo-investigation`: the branch's `docs/MACOS_RUNNER_POLICY.md` blob matches main exactly. Its old v1 tempo notes are superseded by later main records; the current main `V1_TEMPO_INVESTIGATION.md` is longer and contains later validation boundaries. Retain the branch history, not the old document versions.
+- `fix/ballade-v1-layout-2026-10-22`: its only file-level difference is a nine-line historical addition to `docs/reverse/LOG.md`; retain as provenance, no separate re-import identified.
+- `docs/trace-tempo-branch-state-2026-10-26`: its unique FACTS/LOG/NEXT_STEPS additions describe an earlier investigation stage. Later main records contain the resulting findings and limitations. Retain the branch; do not copy the old log wholesale.
+- `docs/upstream-sync-workflow`: one unique commit and 623 commits behind main, but its `docs/UPSTREAM_SYNC.md` blob is identical to main (SHA `109fe86a5d7d56db979bb6d276c22ffac0765a34`). No re-import is needed. It may be considered for ordinary cleanup only after a separate approval.
+- `development`: 0 commits ahead and 6 behind main, with no file differences. It remains an accidental branch; no deletion was performed or authorized.
+
+### Other branch comparisons
+
+The following branches were confirmed as 0 commits ahead of main in the 2026-11-05 comparison; no re-import is indicated:
+
+- `fix/sng-v2-initial-tempo-tick-128-2026-10-30`
+- `fix/sng-v3-v4-tempo-event-timing-2026-10-30`
+- `fix-tempo-ledger`
+- `refactor/move-sng-converter-to-sng-2026-10-30`
+- `maintenance/xunit2031-assert-single`
+- `test/sequencer-schedule-origin`
+- `test/stabilize-split-sysex-stop-windows-2026-10-29`
+- `test/stabilize-stop-silence-timing-2026-10-22`
+- `docs/sng2gs-source-alignment`
+
+These comparisons establish commit reachability, not that every historical file version is present at the same path. Do not use ahead=0 alone as deletion authorization.
+
+### Decision
+
+Keep the explicitly archived v1 branches. Do not merge archived branches wholesale, do not delete any branch or file, and do not synchronize/reset main to upstream. Ordinary cleanup candidates (`development`, `docs/upstream-sync-workflow`, and fully represented task branches) require a separate review and explicit approval. The MIDI comparison CLI findings above are static code-review observations; tests were not executed in this audit.
