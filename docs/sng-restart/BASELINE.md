@@ -117,3 +117,9 @@ Therefore, the current repository has no direct SNG playback reader or MIMPI-com
 The paired reference SMFs inspected for v1–v4 contain a conductor track followed by a SysEx-only track, then the part tracks. Their part-name order is consistent with the SNG2S manual's default descending order, including the v4 insertion of parts 16 down through 11 between parts 10 and 9.
 
 The current converter's `for (part = 1; part <= Parts; part++)` traversal emits parts in ascending order and has no SNG2S option parameter. This is a separate compatibility gap from the missing SysEx-only track. The exact options used to create every private reference MIDI are not yet established, so the manual's default-order rule and each sample's observed order must remain separately recorded.
+
+## Executable identity notes
+
+The inspected SNG2S executable is also an MZ DOS executable. Its file length is 32,383 bytes, its MZ header is 512 bytes, and its header contains seven relocation entries. Its embedded version text identifies SNG2S Ver. 3.3.
+
+The current private-repository tree for MIMPIV427 contains the manual, executable, and font file, but no checked-in Ghidra export or function-analysis text. Earlier handoff documents refer to an export and a different historical path. Until that export's source executable is recovered and byte-compared with the current MIMPIV4.EXE, its function names, addresses, and relocation coverage remain provisional.
