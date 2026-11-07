@@ -266,3 +266,103 @@ These comparisons establish commit reachability, not that every historical file 
 ### Decision
 
 Keep the explicitly archived v1 branches. Do not merge archived branches wholesale, do not delete any branch or file, and do not synchronize/reset main to upstream. Ordinary cleanup candidates (`development`, `docs/upstream-sync-workflow`, and fully represented task branches) require a separate review and explicit approval. The MIDI comparison CLI findings above are static code-review observations; tests were not executed in this audit.
+
+
+## Full branch comparison after PR #62 — 2026-11-07
+
+Base: `main` at `c1620d1d81391a6c62511fa37d09eb6d4a772582`.
+The repository had 64 branches including main (63 compared against main), and no open PRs at the time of the snapshot.
+
+### Comparison summary
+
+- 56 branches: `ahead=0`; their tips are ancestors of current main. The comparison returned no file differences for these refs.
+- 7 branches: diverged from main and require preservation/content review; details are below.
+- An `ahead=0` result proves commit reachability, not that a branch's historical file contents still exist at the same path. It is evidence for cleanup candidacy, not deletion authorization.
+
+### Diverged branches
+
+| Branch | Ahead | Behind | Handling |
+|---|---:|---:|---|
+| `docs/ballade-version-testdata` | 68 | 923 | ARCHIVE; preserve all historical data and commits; no wholesale merge |
+| `docs/trace-tempo-branch-state-2026-10-26` | 4 | 226 | ARCHIVE; preserve unique historical investigation trail |
+| `feature/ballade-sng` | 5 | 927 | ARCHIVE; preserve v1 history |
+| `feature/midi-converter-validation` | 11 | 650 | ARCHIVE; preserve v1 MIDI comparator and history |
+| `fix/ballade-v1-layout-2026-10-22` | 3 | 295 | ARCHIVE; preserve v1 layout history |
+| `reverse/v1-tempo-investigation` | 33 | 624 | ARCHIVE; preserve v1 investigation history |
+| `docs/upstream-sync-workflow` | 1 | 625 | Its `docs/UPSTREAM_SYNC.md` blob is identical to main (SHA `109fe86a5d7d56db979bb6d276c22ffac0765a34`). One commit remains unique, but no current file-content difference was found. Cleanup candidate only after separate approval. |
+
+The six v1/history branches above remain protected archive exceptions. The `docs/upstream-sync-workflow` branch has no missing current document content, but its unique commit history is not reachable from main; do not delete it without explicit approval.
+
+### Ahead-zero branches
+
+The following 56 branches were compared against the current main and returned `ahead=0` with no file differences:
+
+- `development`
+- `docs/add-sng2s-investigation-guide-2026-11-03`
+- `docs/archive-review-ballade-data-2026-11-04`
+- `docs/archive-review-followup-2026-11-04`
+- `docs/archive-review-followup-2026-11-05`
+- `docs/archive-review-inventory-2026-11-04`
+- `docs/audit-empty-part-state-drains-2026-10-27`
+- `docs/ballade-layout-comparison-2026-10-21`
+- `docs/chat-handoff-2026-11-02`
+- `docs/clarify-sng2s-tempo-exit-2026-10-30`
+- `docs/confirm-leading-empty-drain-2026-10-27`
+- `docs/fix-v2-tempo-evidence-wording-2026-10-28`
+- `docs/handoff-2026-11-01-t016`
+- `docs/inspect-default-part-state-2026-10-27`
+- `docs/mimpiv4-exe-analysis-handoff-2026-11-02`
+- `docs/mimpiv4-mode1-043e-write-source-audit-2026-11-01`
+- `docs/mimpiv4-mode1-driver-path-2026-11-01`
+- `docs/mimpiv4-mode1-timer-offset-write-audit-2026-11-01`
+- `docs/mimpiv4-tempo-base-field-trace-2026-10-30`
+- `docs/reconcile-reverse-status-2026-11-03`
+- `docs/record-sng-v2-tempo-merge-2026-10-30`
+- `docs/refresh-ballade-fixture-validation-2026-11-03`
+- `docs/resolve-later-tempo-grid-boundary-2026-10-30`
+- `docs/resolve-v2-tempo-boundary-2026-10-27`
+- `docs/sng2gs-source-alignment`
+- `docs/t016-1430-export-gap-2026-11-02`
+- `docs/t016-mode1-callback-target-2026-11-01`
+- `docs/t016-mode1-dispatch-audit-2026-11-01`
+- `docs/t016-mode2-event-scan-boundary-2026-11-01`
+- `docs/t016-zbar-timer-boundary-2026-11-01`
+- `docs/tempo-block-offsets-2026-10-26`
+- `docs/tempo-branch-state-trace-2026-10-26`
+- `docs/tempo-grid-early-return-2026-10-29`
+- `docs/tempo-grid-return-scope-2026-10-30`
+- `docs/tempo-parser-read-seek-2026-10-26`
+- `docs/tempo-queue-drain-boundary-2026-10-26`
+- `docs/tempo-queue-flush-boundary-2026-10-26`
+- `docs/tempo-startup-count-arithmetic-2026-10-26`
+- `docs/tempo-status-branch-counts-2026-10-26`
+- `docs/trace-absolute-tick-accumulator-2026-10-27`
+- `docs/trace-default-part-state-2026-10-27`
+- `docs/trace-later-tempo-record-ticks-2026-10-28`
+- `docs/trace-n-flag-2026-10-26`
+- `docs/trace-part-state-initialization-2026-10-27`
+- `docs/trace-part-status-2026-10-26`
+- `docs/trace-tempo-grid-first-records-2026-10-26`
+- `docs/trace-v2-base-tempo-source-2026-10-27`
+- `docs/verify-v2-base-tempo-byte-2026-10-27`
+- `fix/sng-v2-initial-tempo-tick-128-2026-10-30`
+- `fix/sng-v3-v4-tempo-event-timing-2026-10-30`
+- `fix-tempo-ledger`
+- `maintenance/xunit2031-assert-single`
+- `refactor/move-sng-converter-to-sng-2026-10-30`
+- `test/sequencer-schedule-origin`
+- `test/stabilize-split-sysex-stop-windows-2026-10-29`
+- `test/stabilize-stop-silence-timing-2026-10-22`
+
+This includes the accidental `development` branch. Its current head is `24681a45430bb93bf47098f42b0adb1387c84dcd`, 8 commits behind main and 0 ahead. It has no file differences in the comparison. It is not used for development; deletion remains a separate decision.
+
+The branches named `docs/archive-review-*` are historical PR/task refs. Their commits are reachable from main, but their branch pointers were not deleted in this audit.
+
+### Cleanup decision
+
+- Keep the six explicitly archived v1/history branches.
+- Do not merge any diverged archive branch wholesale.
+- Treat the 56 ahead-zero branches as cleanup candidates only after checking branch purpose, historical value, and retention exceptions.
+- `docs/upstream-sync-workflow` is also a cleanup candidate because its only file blob matches main, but its one unique commit remains outside main history.
+- No branch or file was deleted. No source, test, fixture, MIDI, or private data was modified.
+- Do not synchronize/reset main to upstream until the archive/documentation review is complete and the user explicitly confirms.
