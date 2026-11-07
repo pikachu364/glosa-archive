@@ -100,3 +100,20 @@ Static analysis must never be described as runtime tracing or successful playbac
 6. Add regression tests that compare decoded events, absolute ticks, tracks, SysEx, controller/program/pitch-bend data, metadata, and end-of-track positions—not merely successful parsing or event counts.
 
 No SNG converter or player code has been changed in this baseline commit.
+
+## Playback architecture audit
+
+The current Glosa playback path is SMF-centric:
+
+- `Playback/SongFiles.cs` recognizes `.mid`, `.midi`, `.rmi`, `.rcp`, `.r36`, `.g18`, and `.g36`; it does not include `.sng`.
+- `PlaybackController` defaults to loading each item with `SmfReader.Read(path)` and stores the result as a `MidiSequence`.
+- `Sequencer` consumes a `MidiSequence` and sends its events to an `IEventSink`.
+- The CLI's documented `play` command accepts MIDI files; the only SNG-specific CLI command is `convert-sng`.
+
+Therefore, the current repository has no direct SNG playback reader or MIMPI-compatible SNG playback path. Adding direct playback is a separate feature, not a small extension to the existing SMF converter. The existing sequencer and output sinks may still be reusable after the MIMPI event/timing model is understood.
+
+## Reference track-order cross-check
+
+The paired reference SMFs inspected for v1–v4 contain a conductor track followed by a SysEx-only track, then the part tracks. Their part-name order is consistent with the SNG2S manual's default descending order, including the v4 insertion of parts 16 down through 11 between parts 10 and 9.
+
+The current converter's `for (part = 1; part <= Parts; part++)` traversal emits parts in ascending order and has no SNG2S option parameter. This is a separate compatibility gap from the missing SysEx-only track. The exact options used to create every private reference MIDI are not yet established, so the manual's default-order rule and each sample's observed order must remain separately recorded.
