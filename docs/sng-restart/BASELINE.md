@@ -162,3 +162,51 @@ The code at CS:1441 also jumps indirectly through CS:[0x140C]. Earlier code at C
 **T-016 correction boundary:** the DS:3432 four-byte countdown records must not be identified as SNG tempo records. Their observed consumer emits note-off-shaped MIDI bytes. The actual MIMPI SNG tempo-record reader and its path into the playback timer remain unidentified. This does not prove that MIMPI ignores tempo records.
 
 These are static observations from the current executable. No runtime trace, DOS execution, or audible playback was performed.
+
+## Cross-validated SNG2S / MIMPI tempo and volume streams
+
+The current executable bytes allow a stronger comparison than the earlier Ghidra function labels.
+
+### Tempo stream
+
+In SNG2S, the scheduler code around CS:350A obtains a record stream through ES:[0x21E0] and advances its cursor in four-byte steps. In MIMPI, the corresponding code around CS:1526 obtains a stream through ES:[0x6E8C] and also advances in four-byte steps.
+
+For both paths, the observed record shape is:
+
+- offset +0: a countdown/delay word;
+- offset +2: a tempo parameter word;
+- a parameter value at or above 0xFF ends the stream;
+- the countdown is decremented by the scheduler before the next tempo change is applied.
+
+Both implementations calculate the timer count as:
+
+`timerCount = clamp(floor(baseTempo * tempoParameter / 64), 1, 480)`
+
+SNG2S then emits an SMF tempo meta event when the timer count changes. Its observed conversion is:
+
+`microsecondsPerQuarter = floor(60000 / timerCount) * 1000`
+
+The assembly performs integer division by 64, clamps to 1..480, divides 60,000 by the resulting count, multiplies by 1,000, and emits `FF 51 03` plus the resulting 24-bit value.
+
+MIMPI applies the same timer-count calculation to its playback timer state instead of writing an SMF tempo event. Its corresponding code stores the computed interval in DS:0442 and passes the interval to the timer-state helper at CS:0E04.
+
+The base-tempo value is not universally fixed at 120. SNG2S loads its base value into DS:2962 from version-dependent internal header state (the v1 and later-version paths use different fields). MIMPI loads DS:7C10 from a version-dependent header structure: its version flag DS:7820 is set to 0, 1, 2, or 3 for SNG version characters '1', '2', '3', or '4'; the base-tempo byte is read at structure offset +0x1C for flag 0 (v1), and +0x06 for flags 1–3 (v2–v4). The mapping from that internal structure to the original file byte offset still needs to be established.
+
+The representative reference samples independently agree with the arithmetic:
+
+- v1: base 120 and parameter 37 produce timerCount 69 and 869,000 µs/qn; the reference also has an exact 869,565 µs/qn event at tick 192.
+- v2: base 60 and parameter 64 produce timerCount 60 and 1,000,000 µs/qn at tick 128.
+- v3: base 120 and parameter 89 produce timerCount 166 and 361,000 µs/qn; the reference has this at tick 92 and an exact 361,445 µs/qn event at tick 192.
+- v4: base 120 and parameter 123 produce timerCount 230 and 260,000 µs/qn at tick 116.
+
+This cross-match strongly confirms the shared tempo-record semantics and the coarse tempo conversion. The separate path that emits exact microseconds-per-quarter at the first bar has not yet been fully traced in the executable.
+
+### Volume stream
+
+SNG2S uses ES:[0x21E4] and MIMPI uses ES:[0x6E90] for a separate four-byte stream. Both read the +0 countdown and +2 value, clamp values at or above 0x65 to 0x4B, and update the volume path. MIMPI's downstream path emits MIDI controller 7 (Channel Volume). Therefore ES:[0x6E90] is a volume automation stream, not the tempo stream.
+
+### Separate note-off timer queue
+
+The SNG2S 64-entry queue at DS:0x0FA0 and the MIMPI 64-entry queue at DS:0x3432 are also distinct from the tempo and volume streams. Their records count down and emit note-off-shaped messages. Do not conflate these three different record queues.
+
+These cross-executable matches are based on static disassembly of the current SNG2S and MIMPIV4 binaries. They do not yet establish every version-specific file offset or the exact startup/bar-boundary tempo path.
