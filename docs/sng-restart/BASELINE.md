@@ -210,3 +210,31 @@ SNG2S uses ES:[0x21E4] and MIMPI uses ES:[0x6E90] for a separate four-byte strea
 The SNG2S 64-entry queue at DS:0x0FA0 and the MIMPI 64-entry queue at DS:0x3432 are also distinct from the tempo and volume streams. Their records count down and emit note-off-shaped messages. Do not conflate these three different record queues.
 
 These cross-executable matches are based on static disassembly of the current SNG2S and MIMPIV4 binaries. They do not yet establish every version-specific file offset or the exact startup/bar-boundary tempo path.
+
+## Base-tempo field locations and current converter defects
+
+The base-tempo byte was cross-checked against SNG2S tempo output across the private SNG_DATA corpus:
+
+- v1: `conductorStart + 27` (for the current v1 layout, file offset 0x8F).
+- v2: file offset 0x79.
+- v3: file offset 0x79.
+- v4: file offset 0x91.
+
+The v2 corpus has base-tempo values from 60 through 158. The v3 corpus includes non-120 values such as 116, 117, and 133. The v4 corpus includes non-120 values such as 104, 117, and 126. The v4 field at 0x91 matched the inferred SNG2S base-tempo value for all ten inspected v4 SNG/MID pairs.
+
+Examples independently checked against reference MIDI:
+
+- v3 base 116, tempo parameter 71: `floor(116 * 71 / 64) = 128`; SNG2S emits 468,000 µs/qn, matching the reference at tick 92.
+- v3 base 117, tempo parameter 77: timer count 140; 428,000 µs/qn, matching the reference at tick 92.
+- v4 base 104, tempo parameter 78: timer count 126; 476,000 µs/qn, matching the reference at tick 116.
+- v4 base 126, tempo parameter 46: timer count 90; 666,000 µs/qn, matching the reference at tick 116.
+
+This exposes concrete gaps in the current converter:
+
+- `ReadLaterVersionTempi` uses `2 * value - ceil(value / 8)`, which is equivalent to using base tempo 120. It must instead use the version's actual base-tempo byte.
+- `ReadTempi`, used as a fallback, also assumes the 120-based curve and starts its tick accumulator at zero.
+- `TryReadV2InitialTempo` handles only the inspected special case `(step=0, value=64)` and returns a single point. It does not consume the remaining tempo records.
+- Across the ten inspected v2 pairs, the first non-default reference tempo event occurs at different ticks (including 108, 128, 152, and 192). The current fixed tick-128 special case cannot represent these startup paths.
+- The v3/v4 initial-tick shortcut only handles the part-information states 4 and 5. Other observed initial positions require their own startup-path analysis.
+
+The tempo-record arithmetic and base-tempo fields are now strongly supported by executable disassembly and paired reference MIDI. The complete version-specific startup tick derivation is still open; do not replace the current code with a new fixed offset.
