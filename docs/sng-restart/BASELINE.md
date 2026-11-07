@@ -136,3 +136,29 @@ A byte-level SMF scan of one paired SNG2S reference from each version produced t
 | v4 | 1,721 | 1,721 | 24 | 224 | 18 |
 
 The v2–v4 tempo counts show why a single initial-tempo assertion is not an adequate test. The SysEx counts also show that SysEx generation is not a small optional corner case in the representative later-version files.
+
+## MIMPI V4.27 raw-code re-check: timer queue versus tempo stream
+
+A first independent disassembly pass was made from the current MIMPIV4.EXE bytes, not from Ghidra function names. The MZ header is 160 paragraphs (0xA00 bytes). Under the assumed load-image base segment 0x1000, a segmented address is mapped to file offset by:
+
+`file_offset = 0xA00 + (segment - 0x1000) * 16 + offset`
+
+This mapping must still be checked against the exact base used by the earlier Ghidra project.
+
+The code around file offset 0x11D80 disassembles coherently when aligned from CS:141F:
+
+- CS:141F begins a routine with `push bp`.
+- CS:1429 clears DS:0440.
+- CS:142F loads CX from DS:7C10; CS:1433 stores it to DS:0442.
+- CS:1437 performs a far call to 0FF6:1431.
+- CS:143C calls CS:1B1A, then returns at CS:143F–1440.
+
+With the mapping above, the historical address 1FF5:1430 lands inside the instruction beginning at CS:142F, not at an instruction boundary. Therefore the earlier label of 1FF5:1430 as a callback entry is not currently substantiated. Resolve the original Ghidra image-base / segment mapping and exact input executable before reusing that address.
+
+Adjacent code at CS:1446 checks DS:0434 against 1, then scans up to 64 four-byte records beginning at DS:3432. It decrements each record's first word as a countdown. When a countdown expires, it passes the record's +2 and +3 bytes, followed by zero, to the byte-output routine at CS:5E24. A separate flush routine at CS:1DB6 explicitly constructs a status byte as `0x80 | (record[+2] & 0x0F)`, sends record[+3] as the data byte, and sends zero as the final byte. This is strong evidence that this particular table is a pending note-off timer queue, not a tempo-value table.
+
+The code at CS:1441 also jumps indirectly through CS:[0x140C]. Earlier code at CS:1404 writes 0x34B1 into that slot, so the dispatch target is runtime-modified; the static bytes initially present at CS:140C are not the final target. This is another reason not to infer function boundaries from a static function listing alone.
+
+**T-016 correction boundary:** the DS:3432 four-byte countdown records must not be identified as SNG tempo records. Their observed consumer emits note-off-shaped MIDI bytes. The actual MIMPI SNG tempo-record reader and its path into the playback timer remain unidentified. This does not prove that MIMPI ignores tempo records.
+
+These are static observations from the current executable. No runtime trace, DOS execution, or audible playback was performed.
