@@ -123,3 +123,16 @@ The current converter's `for (part = 1; part <= Parts; part++)` traversal emits 
 The inspected SNG2S executable is also an MZ DOS executable. Its file length is 32,383 bytes, its MZ header is 512 bytes, and its header contains seven relocation entries. Its embedded version text identifies SNG2S Ver. 3.3.
 
 The current private-repository tree for MIMPIV427 contains the manual, executable, and font file, but no checked-in Ghidra export or function-analysis text. Earlier handoff documents refer to an export and a different historical path. Until that export's source executable is recovered and byte-compared with the current MIMPIV4.EXE, its function names, addresses, and relocation coverage remain provisional.
+
+## Representative reference-event counts
+
+A byte-level SMF scan of one paired SNG2S reference from each version produced the following counts. These are sample baselines, not universal version limits:
+
+| Version | Note-ons | Note-offs | Conductor tempo events | SysEx events in dedicated track | SMF tracks |
+|---|---:|---:|---:|---:|---:|
+| v1 | 3,295 | 3,295 | 3 | 4 | 12 |
+| v2 | 2,713 | 2,713 | 424 | 17 | 12 |
+| v3 | 5,362 | 5,362 | 10 | 41 | 12 |
+| v4 | 1,721 | 1,721 | 24 | 224 | 18 |
+
+The v2–v4 tempo counts show why a single initial-tempo assertion is not an adequate test. The SysEx counts also show that SysEx generation is not a small optional corner case in the representative later-version files.
