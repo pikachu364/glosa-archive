@@ -238,3 +238,25 @@ This exposes concrete gaps in the current converter:
 - The v3/v4 initial-tick shortcut only handles the part-information states 4 and 5. Other observed initial positions require their own startup-path analysis.
 
 The tempo-record arithmetic and base-tempo fields are now strongly supported by executable disassembly and paired reference MIDI. The complete version-specific startup tick derivation is still open; do not replace the current code with a new fixed offset.
+
+## Scheduler architecture: parallel conductor, tempo, volume, and SysEx streams
+
+The SNG2S scheduler does not treat all conductor information as one simple tempo list. Its code maintains separate stream pointers:
+
+- ES:[0x21DC]: conductor/time-signature stream; the consumer emits SMF time-signature meta events (`FF 58 04`).
+- ES:[0x21E0]: tempo stream; the consumer calculates the timer interval and emits `FF 51 03`.
+- ES:[0x21E4]: volume automation stream; the consumer updates the volume state.
+- ES:[0x1E50]: SysEx stream; records select SysEx payload data and emit the payload bytes.
+
+MIMPI V4.27 has a structurally corresponding set of pointers:
+
+- ES:[0x6E88]: conductor/time-signature stream.
+- ES:[0x6E8C]: tempo stream.
+- ES:[0x6E90]: volume automation stream.
+- ES:[0x6A5C]: SysEx stream.
+
+The tempo and volume streams use four-byte records with a countdown/delay word at +0 and a value word at +2. The time-signature stream also uses four-byte records but has its own sentinel and output logic. These streams are serviced by a shared scheduler; the note-off timer queue is another separate mechanism.
+
+This matters for startup timing. Across the ten inspected v2 reference pairs, the first non-default tempo event occurs at different positions, including ticks 108, 128, 152, and 192. The first tempo record's step alone does not explain all these offsets. The SNG2S scheduler also advances and services the conductor/time-signature stream and startup/setup state. A converter that simply sums tempo-record steps from a fixed initial tick is not a generally valid model.
+
+The next reverse-engineering target is the shared scheduler's current-tick state and the interaction between the conductor/time-signature stream and the tempo countdown. Reconstruct this before replacing the v2/v3/v4 tick-placement shortcuts.
